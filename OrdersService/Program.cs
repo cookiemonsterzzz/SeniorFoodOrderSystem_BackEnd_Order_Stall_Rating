@@ -1,20 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using OrdersService;
-using OrdersService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<OrdersContext>(opt =>
-    opt.UseInMemoryDatabase("OrderList"));
+builder.Services.AddDbContext<SeniorFoodOrderSystemDatabaseContext>(
+    (options) => options.UseSqlServer("ConnectionStrings:DefaultConnection"));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<OrdersDbContext>(
-    (options) => options.UseSqlServer("ConnectionStrings:DefaultConnection"));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigins",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")  // Replace with your frontend's domain
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -30,5 +36,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("AllowOrigins");
 
 app.Run();

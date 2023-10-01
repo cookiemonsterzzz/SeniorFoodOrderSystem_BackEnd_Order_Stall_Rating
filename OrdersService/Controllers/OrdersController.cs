@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OrdersService.Models;
+using OrdersService.Dto;
 
 namespace OrdersService.Controllers
 {
@@ -14,65 +8,133 @@ namespace OrdersService.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly OrdersDbContext _context;
+        private readonly SeniorFoodOrderSystemDatabaseContext _context;
 
-        public OrdersController(OrdersDbContext context)
+        public OrdersController(SeniorFoodOrderSystemDatabaseContext context)
         {
             _context = context;
         }
 
-        // GET: api/Orders
-        [HttpGet]
-        public async Task<IEnumerable<Order>> GetOrders()
+        [HttpGet("getOrder")]
+        public async Task<List<OrderDto>> GetOrders()
         {
-          if (_context.Orders == null)
-          {
-                return null!;
-          }
-            return await _context.Orders.ToListAsync();
+            var result = await _context.Orders.Include(x => x.Payments)
+                .Select(x => new OrderDto
+                {
+                    Id = x.Id,
+                    OrderName = x.OrderName,
+                    OrderDescription = x.OrderDescription,
+                    OrderDate = x.OrderDate,
+                    UserId = x.UserId,
+                    FoodName = x.FoodName,
+                    FoodCustomization = x.FoodCustomization,
+                    FoodPrice = x.FoodPrice,
+                    Quantity = x.Quantity,
+                    OrderStatus = x.Payments.Count > 0 ? "Paid" : "Unpaid",
+                })
+                .ToListAsync();
+
+            return result;
         }
 
-        // GET: api/Orders/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrders(Guid id)
+        [HttpGet("getOrderByName")]
+        public async Task<ActionResult<OrderDto>> GetOrderByName(string orderName)
         {
-          if (_context.Orders == null)
-          {
-              return NotFound();
-          }
-            var orders = await _context.Orders.FindAsync(id);
+            var existingOrder = await _context.Orders.Include(x => x.Payments)
+                                .FirstOrDefaultAsync(x => x.OrderName == orderName);
 
-            if (orders == null)
+            if (existingOrder is null)
             {
                 return NotFound();
             }
 
-            return orders;
+            var result = new OrderDto
+            {
+                Id = existingOrder.Id,
+                OrderName = existingOrder.OrderName,
+                OrderDescription = existingOrder.OrderDescription,
+                OrderDate = existingOrder.OrderDate,
+                UserId = existingOrder.UserId,
+                FoodName = existingOrder.FoodName,
+                FoodCustomization = existingOrder.FoodCustomization,
+                FoodPrice = existingOrder.FoodPrice,
+                Quantity = existingOrder.Quantity,
+                OrderStatus = existingOrder.Payments.Count > 0 ? "Paid" : "Unpaid",
+            };
+
+            return result;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Orders>> PostOrders(Orders order)
+        [HttpPost("upsertOrder")]
+        public async Task<ActionResult<Order>> PostOrder(OrderDto order)
         {
-            if (_context.Orders == null)
+            var existingOrder = await _context.Orders.FirstOrDefaultAsync(x => x.Id == order.Id);
+
+            if (existingOrder is null)
             {
-                return Problem("Entity set 'OrdersDbContext.Orders'  is null.");
+                existingOrder = new Order
+                {
+                    Id = Guid.NewGuid(),
+                    OrderDate = DateTimeOffset.Now,
+                    UserId = order.UserId,
+                    FoodName = order.FoodName,
+                    FoodCustomization = order.FoodCustomization,
+                    FoodPrice = order.FoodPrice,
+                    Quantity = order.Quantity,
+                    OrderName = order.OrderName,
+                    OrderDescription = order.OrderDescription,
+
+                };
+                await _context.Orders.AddAsync(existingOrder);
+            }
+            else
+            {
+                existingOrder.Id = Guid.NewGuid();
+                existingOrder.OrderDate = DateTimeOffset.Now;
+                existingOrder.UserId = order.UserId;
+                existingOrder.FoodName = order.FoodName;
+                existingOrder.FoodCustomization = order.FoodCustomization;
+                existingOrder.FoodPrice = order.FoodPrice;
+                existingOrder.Quantity = order.Quantity;
+                existingOrder.OrderName = order.OrderName;
+                existingOrder.OrderDescription = order.OrderDescription;
+                _context.Orders.Update(existingOrder);
             }
 
-            Order dbOrder = new Order();
-            dbOrder.Id = new Guid();
-            dbOrder.Orderdate = DateTimeOffset.Now;
-            dbOrder.Userid = order.Userid;
-            dbOrder.Foodname = order.Foodname;
-            dbOrder.Foodcustomization = order.Foodcustomization;
-            dbOrder.Foodprice = order.Foodprice;
-            dbOrder.Quantity = order.Quantity;
-            dbOrder.Ordername = order.Ordername;
-            dbOrder.Orderdescription = order.Orderdescription;
-
-            _context.Orders.Add(dbOrder);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrders", new { id = dbOrder.Id }, dbOrder);
+            var result = new OrderDto
+            {
+                Id = existingOrder.Id,
+                OrderName = existingOrder.OrderName,
+                OrderDescription = existingOrder.OrderDescription,
+                OrderDate = existingOrder.OrderDate,
+                UserId = existingOrder.UserId,
+                FoodName = existingOrder.FoodName,
+                FoodCustomization = existingOrder.FoodCustomization,
+                FoodPrice = existingOrder.FoodPrice,
+                Quantity = existingOrder.Quantity,
+                OrderStatus = "",
+            };
+
+            return Ok(result);
+        }
+
+        [HttpPost("deleteOrder")]
+        public async Task<ActionResult> DeleteOrder(Guid id)
+        {
+            var existingOrder = await _context.Orders.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existingOrder is null)
+            {
+                return NotFound();
+            }
+
+            _context.Orders.Remove(existingOrder);
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }
