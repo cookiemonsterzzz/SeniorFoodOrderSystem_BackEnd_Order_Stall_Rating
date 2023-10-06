@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OrdersService;
+namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating;
 
 public partial class Stall
 {
@@ -19,7 +19,7 @@ public partial class Stall
 
     public virtual ICollection<Food> Foods { get; set; } = new List<Food>();
 
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<StallRating> StallRatings { get; set; } = new List<StallRating>();
 }

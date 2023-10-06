@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace OrdersService;
+namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating;
 
 public partial class SeniorFoodOrderSystemDatabaseContext : DbContext
 {
@@ -96,6 +96,9 @@ public partial class SeniorFoodOrderSystemDatabaseContext : DbContext
             entity.ToTable("Order");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.Amount).HasColumnType("decimal(19, 4)");
+            entity.Property(e => e.DateTimeCreated).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.DateTimeUpdated).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.FoodCustomization).HasMaxLength(100);
             entity.Property(e => e.FoodName).HasMaxLength(100);
             entity.Property(e => e.FoodPrice).HasColumnType("decimal(11, 2)");
@@ -106,7 +109,15 @@ public partial class SeniorFoodOrderSystemDatabaseContext : DbContext
             entity.Property(e => e.OrderName)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.OrderStatus)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Pending')");
             entity.Property(e => e.Quantity).HasColumnType("decimal(11, 2)");
+
+            entity.HasOne(d => d.Stall).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.StallId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Stall_Order");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
@@ -123,20 +134,17 @@ public partial class SeniorFoodOrderSystemDatabaseContext : DbContext
             entity.Property(e => e.DateTimeCreated).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.DateTimeUpdated).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
+            entity.Property(e => e.PaymentMode)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Cash')");
             entity.Property(e => e.PaymentStatus)
                 .HasMaxLength(10)
                 .IsUnicode(false);
-            entity.Property(e => e.StallId).HasColumnName("StallID");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Payment_Order");
-
-            entity.HasOne(d => d.Stall).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.StallId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Payment_Stall");
         });
 
         modelBuilder.Entity<Stall>(entity =>

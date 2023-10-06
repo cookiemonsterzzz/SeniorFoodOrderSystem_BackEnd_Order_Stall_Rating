@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OrdersService;
+namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating;
 
 public partial class Payment
 {
@@ -11,15 +11,13 @@ public partial class Payment
 
     public decimal Amount { get; set; }
 
-    public Guid StallId { get; set; }
-
     public string PaymentStatus { get; set; } = null!;
+
+    public string PaymentMode { get; set; } = null!;
 
     public DateTimeOffset? DateTimeCreated { get; set; }
 
     public DateTimeOffset? DateTimeUpdated { get; set; }
 
     public virtual Order Order { get; set; } = null!;
-
-    public virtual Stall Stall { get; set; } = null!;
 }
