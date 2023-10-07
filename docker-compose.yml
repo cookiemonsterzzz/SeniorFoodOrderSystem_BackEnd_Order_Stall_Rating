@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  seniorfoodordersystem_backend_order_stall_rating:
+    image: ${DOCKER_REGISTRY-}seniorfoodordersystembackendorderstallrating
+    build:
+      context: .
+      dockerfile: SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating/Dockerfile

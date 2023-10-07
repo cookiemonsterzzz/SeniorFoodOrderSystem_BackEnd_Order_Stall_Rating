@@ -5,6 +5,8 @@ VisualStudioVersion = 25.0.1706.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating", "SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating\SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.csproj", "{2F36C14C-16FF-4F27-AC5C-90854DD9FDE5}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{67D310C9-4142-4B8E-8B08-14D10B2302F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2F36C14C-16FF-4F27-AC5C-90854DD9FDE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F36C14C-16FF-4F27-AC5C-90854DD9FDE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F36C14C-16FF-4F27-AC5C-90854DD9FDE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67D310C9-4142-4B8E-8B08-14D10B2302F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67D310C9-4142-4B8E-8B08-14D10B2302F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67D310C9-4142-4B8E-8B08-14D10B2302F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67D310C9-4142-4B8E-8B08-14D10B2302F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

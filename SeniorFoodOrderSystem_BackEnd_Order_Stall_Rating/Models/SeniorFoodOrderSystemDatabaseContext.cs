@@ -174,6 +174,11 @@ public partial class SeniorFoodOrderSystemDatabaseContext : DbContext
             entity.Property(e => e.DateTimeUpdated).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Review).HasMaxLength(1000);
 
+            entity.HasOne(d => d.Order).WithMany(p => p.StallRatings)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StallRating_Order");
+
             entity.HasOne(d => d.Stall).WithMany(p => p.StallRatings)
                 .HasForeignKey(d => d.StallId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

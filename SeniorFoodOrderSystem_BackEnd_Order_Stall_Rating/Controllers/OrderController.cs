@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
@@ -21,9 +17,14 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
         }
 
         [HttpGet("getOrderHistories")]
-        public async Task<List<OrderDto>> GetOrderHistories()
+        public async Task<ActionResult<List<OrderDto>>> GetOrderHistories()
         {
             var userId = await GetUserIdByToken();
+
+            if (userId is null)
+            {
+                return NotFound("User not found.");
+            }
 
             var result = await _context.Orders
                         .Select(x => new OrderDto
@@ -73,6 +74,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
                     FoodPrice = order.FoodPrice,
                     Amount = order.Amount,
                     Quantity = order.Quantity,
+                    StallId = order.StallId,
                     OrderStatus = order.OrderStatus
                 };
 

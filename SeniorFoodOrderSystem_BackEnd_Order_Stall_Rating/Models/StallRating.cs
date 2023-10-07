@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating;
+﻿namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating;
 
 public partial class StallRating
 {
     public Guid Id { get; set; }
+
+    public Guid OrderId { get; set; }
 
     public Guid StallId { get; set; }
 
@@ -18,6 +17,8 @@ public partial class StallRating
     public DateTimeOffset? DateTimeCreated { get; set; }
 
     public DateTimeOffset? DateTimeUpdated { get; set; }
+
+    public virtual Order Order { get; set; } = null!;
 
     public virtual Stall Stall { get; set; } = null!;
 
