@@ -16,8 +16,8 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
             _context = context;
         }
 
-        [HttpGet("getOrderHistories")]
-        public async Task<ActionResult<List<OrderDto>>> GetOrderHistories()
+        [HttpGet("getOrders")]
+        public async Task<ActionResult<List<OrderDto>>> GetOrders()
         {
             var userId = await GetUserIdByToken();
 
@@ -43,8 +43,19 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
                         })
                         .ToListAsync();
 
+            var statusPriority = new Dictionary<string, int>
+                                {
+                                    {"Unpaid", 0},
+                                    {"Paid", 1},
+                                    {"In Progress", 2},
+                                    {"Done", 3},
+                                    {"Other Status", 4} // Add more statuses as needed
+                                };
+
             // Calculate a sort key based on OrderStatus (Unpaid orders first, then Paid orders)
-            result = result.OrderBy(x => x.OrderStatus == "Unpaid" ? 0 : 1)
+            result = result.OrderBy(x => statusPriority.ContainsKey(x.OrderStatus)
+                                            ? statusPriority[x.OrderStatus]
+                                            : 4)
                            .ThenByDescending(x => x.OrderDate)
                            .ToList();
 
