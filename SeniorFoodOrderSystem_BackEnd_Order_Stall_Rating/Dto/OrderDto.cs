@@ -25,5 +25,13 @@
         public decimal Quantity { get; set; }
 
         public string OrderStatus { get; set; } = string.Empty;
+
+        public RatingDto? Rating { get; set; } = null;
+    }
+
+    public class RatingDto
+    {
+        public int Rating { get; set; }
+        public string Review { get; set; }
     }
 }

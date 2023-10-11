@@ -44,7 +44,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<StallRating>> PostStallRating(StallRatingDto stallRatingDto)
+        public async Task<ActionResult<StallRating>> PostStallRating([FromBody] StallRatingDto stallRatingDto)
         {
             if (!ModelState.IsValid)
             {
@@ -73,13 +73,14 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
                 StallId = stallRatingDto.StallId,
                 UserId = (Guid)userId,
                 Rating = stallRatingDto.Rating,
-                Review = stallRatingDto.Review
+                Review = stallRatingDto.Review,
+                DateTimeCreated = DateTimeOffset.Now,
             };
 
             _context.StallRatings.Add(stallRating);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStallRating", new { id = stallRating.Id }, stallRating);
+            return Ok(stallRating);
         }
 
         [HttpPut("{id}")]

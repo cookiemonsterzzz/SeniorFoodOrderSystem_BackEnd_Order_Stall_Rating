@@ -53,9 +53,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
                                 };
 
             // Calculate a sort key based on OrderStatus (Unpaid orders first, then Paid orders)
-            result = result.OrderBy(x => statusPriority.ContainsKey(x.OrderStatus)
-                                            ? statusPriority[x.OrderStatus]
-                                            : 4)
+            result = result.OrderBy(x => statusPriority.ContainsKey(x.OrderStatus) ? statusPriority[x.OrderStatus] : 4)
                            .ThenByDescending(x => x.OrderDate)
                            .ToList();
 
@@ -73,6 +71,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
             }
             else
             {
+                var rating = await _context.StallRatings.FirstOrDefaultAsync(x => x.OrderId == orderId);
                 var result = new OrderDto
                 {
                     Id = order.Id,
@@ -86,7 +85,14 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
                     Amount = order.Amount,
                     Quantity = order.Quantity,
                     StallId = order.StallId,
-                    OrderStatus = order.OrderStatus
+                    OrderStatus = order.OrderStatus,
+                    Rating = rating is null
+                            ? null
+                            : new RatingDto
+                            {
+                                Rating = rating.Rating,
+                                Review = rating.Review ?? string.Empty
+                            }
                 };
 
                 return Ok(result);
