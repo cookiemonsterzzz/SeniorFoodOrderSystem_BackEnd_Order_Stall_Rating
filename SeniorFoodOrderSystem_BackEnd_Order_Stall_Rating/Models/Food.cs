@@ -9,7 +9,7 @@ public partial class Food
 
     public string FoodName { get; set; } = null!;
 
-    public string? FoodDescription { get; set; }
+    public string? ImageUrl { get; set; }
 
     public decimal FoodPrice { get; set; }
 
