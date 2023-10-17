@@ -27,6 +27,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Order_Stall_Rating.Controllers
             }
 
             var result = await _context.Orders
+                        .Where(x => x.UserId == userId)
                         .Select(x => new OrderDto
                         {
                             Id = x.Id,
